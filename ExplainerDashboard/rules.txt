@@ -1,0 +1,3 @@
+Rule_2 :: plant(para,11) implies qty(11,para);
+Rule_2 :: plant(ora,3) implies qty(3,ora);
+Rule_3 :: qty(3,ora), ?<(3,5) implies suggest(ora);

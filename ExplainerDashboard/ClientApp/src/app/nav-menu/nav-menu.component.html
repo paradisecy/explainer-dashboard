@@ -1,0 +1,67 @@
+<header>
+  <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark box-shadow mb-3">
+    <div>
+      <a class="navbar-brand" [routerLink]="['/']">Explainer Dashboard</a>
+
+    </div>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav">
+        <!--<a class="nav-item nav-link active" href="#">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-item nav-link" href="#">Features</a>
+        <a class="nav-item nav-link" href="#">Pricing</a>
+        <a class="nav-item nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>-->
+
+
+      </div>
+    </div>
+    <form class="form-inline">
+      <dx-button *ngIf="solution" style="margin-right: 5px;"
+                 icon="chevronright"
+                 (onClick)="processSolution($event)">
+      </dx-button>
+      <dx-button *ngIf="solution" style="margin-right: 5px"
+                 icon="save"
+                 (onClick)="saveSolutions($event)">
+      </dx-button>
+      <dx-button *ngIf="solution" style="margin-right: 5px"
+                 icon="remove"
+                 (onClick)="removeSolution($event)">
+      </dx-button>
+      <dx-button style="margin-right: 5px"
+                 icon="plus"
+                 (onClick)="createSolution($event)">
+      </dx-button>
+      <dx-select-box class="nav-item" style="float:right"
+                     (onValueChanged)="handleValueChange($event)"
+                     [items]="solutions"
+                     valueExpr="id"
+                     displayExpr="name"
+                     placeholder="Choose Solution"
+                     [showClearButton]="true">
+
+      </dx-select-box>
+    </form>
+  </nav>
+</header>
+<dx-popup [width]="300"
+          [height]="250"
+          [showTitle]="true"
+          title="New Solution"
+          [dragEnabled]="false"
+          [closeOnOutsideClick]="true"
+          [(visible)]="popupVisible">
+  <div *dxTemplate="let data of 'content'">
+    <form (submit)="onCreateFormSubmit($event)">
+      <dx-form [(formData)]="newSolution">
+        <dxi-item dataField="name">
+          <dxi-validation-rule type="required"
+                               message="Solution name is required">
+          </dxi-validation-rule>
+        </dxi-item>
+        <dxi-item itemType="button"
+                  [buttonOptions]="buttonOptions">
+        </dxi-item>
+      </dx-form>
+    </form>
+  </div>
+</dx-popup>

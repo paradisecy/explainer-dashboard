@@ -1,0 +1,7 @@
+Rule_2 :: plant(X,Y) implies qty(Y,X);
+Rule_3 :: qty(T,P), ?<(T,5) implies suggest(P);
+
+
+
+
+

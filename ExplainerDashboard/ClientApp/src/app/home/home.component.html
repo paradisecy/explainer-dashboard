@@ -1,5 +1,5 @@
 
-<dx-box direction="col"
+<dx-box direction="row"
         width="100%"
         [height]="1000">
   <dxi-item [ratio]="1">
@@ -11,7 +11,7 @@
                 width="100%"
                 [height]="75">
           <dxi-item [ratio]="1">
-            <h3>Data</h3>
+            <h3>Day</h3>
           </dxi-item>
           <dxi-item [ratio]="1">
             <dx-select-box (onValueChanged)="dayValueChange($event)"
@@ -29,57 +29,115 @@
                 width="100%"
                 [height]="400">
           <dxi-item [ratio]="1">
-            <dx-data-grid #flockGrid
-                          id="flockGrid"
-                          [showBorders]="true"
-                          [dataSource]="dataSource"
-                          [columns]="columns"
-                          [allowColumnResizing]="true"
-                          [columnAutoWidth]="true">
 
-              <dxo-export [enabled]="true" fileName="file"></dxo-export>
-              <dxo-search-panel [visible]="true"></dxo-search-panel>
-              <dxo-filter-row [visible]="true"></dxo-filter-row>
+            <dx-accordion #accordion
+                          [dataSource]="companies"
+                          [collapsible]="true"
+                          [multiple]="false"
+                          [animationDuration]="300"
+                          [selectedItems]="[companies[0]]">
+              <div *dxTemplate="let company of 'title'">
+                <h1>{{company.name}}</h1>
+              </div>
+              <div *dxTemplate="let company of 'item'">
+                <dx-data-grid [hidden]="company.ID !== 1" #flockGrid
+                              id="flockGrid"
+                              [showBorders]="true"
+                              [dataSource]="dataSource"
+                              [columns]="columns"
+                              [allowColumnResizing]="true"
+                              [columnAutoWidth]="true">
 
-              <dxo-editing mode="row"
-                           [allowUpdating]="true"
-                           [allowAdding]="true"
-                           [allowDeleting]="true">
-              </dxo-editing>
-              <dxo-selection mode="single"></dxo-selection>
-            </dx-data-grid>
-          </dxi-item>
-          <dxi-item [ratio]="0.2">
-            <h3>Demand</h3>
-          </dxi-item>
-          <dxi-item [ratio]="1">
-            <dx-data-grid #demandGrid
-                          id="demandGrid"
-                          [showBorders]="true"
-                          [dataSource]="demandDataSource"
-                          [columns]="demandColumns"
-                          [allowColumnResizing]="true"
-                          [columnAutoWidth]="true">
+                  <dxo-export [enabled]="true" fileName="file"></dxo-export>
+                  <dxo-search-panel [visible]="true"></dxo-search-panel>
+                  <dxo-filter-row [visible]="true"></dxo-filter-row>
 
-              <dxo-export [enabled]="true" fileName="file"></dxo-export>
-              <dxo-search-panel [visible]="true"></dxo-search-panel>
-              <dxo-filter-row [visible]="true"></dxo-filter-row>
+                  <dxo-editing mode="row"
+                               [allowUpdating]="true"
+                               [allowAdding]="true"
+                               [allowDeleting]="true">
+                  </dxo-editing>
+                  <dxo-selection mode="single"></dxo-selection>
+                </dx-data-grid>
 
-              <dxo-editing mode="row"
-                           [allowUpdating]="true"
-                           [allowAdding]="true"
-                           [allowDeleting]="true">
-              </dxo-editing>
-              <dxo-selection mode="single"></dxo-selection>
-            </dx-data-grid>
+                <dx-data-grid [hidden]="company.ID !== 3" #demandGrid
+                              id="demandGrid"
+                              [showBorders]="true"
+                              [dataSource]="demandDataSource"
+                              [columns]="demandColumns"
+                              [allowColumnResizing]="true"
+                              [columnAutoWidth]="true">
+
+                  <dxo-export [enabled]="true" fileName="file"></dxo-export>
+                  <dxo-search-panel [visible]="true"></dxo-search-panel>
+                  <dxo-filter-row [visible]="true"></dxo-filter-row>
+
+                  <dxo-editing mode="row"
+                               [allowUpdating]="true"
+                               [allowAdding]="true"
+                               [allowDeleting]="true">
+                  </dxo-editing>
+                  <dxo-selection mode="single"></dxo-selection>
+                </dx-data-grid>
+
+
+                  <dx-chart  [hidden]="company.ID !== 2" #chart>
+                    <dxo-common-series-settings type="bar"></dxo-common-series-settings>
+                    <dxo-size [height]="200"></dxo-size>
+                    <dxo-adaptive-layout [width]="450"></dxo-adaptive-layout>
+                    <dxo-tooltip [enabled]="true" format="currency"></dxo-tooltip>
+                  </dx-chart>
+
+                  <dx-pivot-grid  [hidden]="company.ID !== 2" #pivotgrid
+                                 [allowSortingBySummary]="true"
+                                 [allowFiltering]="true"
+                                 [showBorders]="true"
+                                 [allowSortingBySummary]="true"
+                                 [showColumnGrandTotals]="false"
+                                 [showRowGrandTotals]="false"
+                                 [showRowTotals]="false"
+                                 [showColumnTotals]="false"
+                                 [dataSource]="pivotGridDataSource">
+                    <dxo-field-chooser [enabled]="true" [height]="400"></dxo-field-chooser>
+                    <dxo-scrolling mode="virtual"></dxo-scrolling>
+                  </dx-pivot-grid>
+             
+
+              </div>
+            </dx-accordion>
+            <dxi-item style="margin-top:15px;" [ratio]="4">
+              <h3>Explanation</h3>
+              <dx-text-area [height]="380"
+                            [maxLength]="maxLength"
+                            [(value)]="solutionService.currentSolution.explain">
+              </dx-text-area>
+            </dxi-item>
           </dxi-item>
         </dx-box>
 
       </dxi-item>
 
+
+    </dx-box>
+  </dxi-item>
+  <dxi-item [ratio]="1">
+    <dx-box direction="col"
+            style="margin-left:15px"
+            width="98%"
+            [height]="1000">
+
+      <dxi-item [ratio]="2" style="margin-top:60px">
+        <h3 style="margin-left: 15px;margin-top: 15px">Context</h3>
+        <dx-text-area style="margin-left:15px;margin-right:15px;"
+                      [height]="380"
+                      [maxLength]="maxLength"
+                      [(value)]="solutionService.currentSolution.coach">
+        </dx-text-area>
+
+      </dxi-item>
       <dxi-item [ratio]="2">
         <h3 style="margin-left: 15px;margin-top: 15px">Coaching</h3>
-       
+
         <dx-text-area style="margin-left:15px;margin-right:15px;"
                       [height]="380"
                       [maxLength]="maxLength"
@@ -90,33 +148,9 @@
       </dxi-item>
     </dx-box>
   </dxi-item>
-  <dxi-item [ratio]="1">
-    <dx-box direction="row"
-            width="100%"
-            [height]="400">
-      <dxi-item style="margin:15px;" [ratio]="4">
-        <h3>Explanation</h3>
-        <dx-text-area 
-                      [height]="380"
-                      [maxLength]="maxLength"
-                      [(value)]="solutionService.currentSolution.explain">
-        </dx-text-area>
-      </dxi-item>
-      <dxi-item [ratio]="2">
-        <h3 style="margin-left: 15px;margin-top: 15px">Context</h3>
-        <dx-text-area style="margin-left:15px;margin-right:15px;"
-                      [height]="380"
-                      [maxLength]="maxLength"
-                      [(value)]="solutionService.currentSolution.coach">
-        </dx-text-area>
+  <!--<dxi-item [ratio]="0.2">
 
-      </dxi-item>
-
-    </dx-box>
-  </dxi-item>
-  <dxi-item [ratio]="0.2">
-
-  </dxi-item>
+  </dxi-item>-->
 </dx-box>
 
 

@@ -1,3 +1,6 @@
-Rule_2 :: plant(para,11) implies qty(11,para);
-Rule_2 :: plant(ora,3) implies qty(3,ora);
-Rule_3 :: qty(3,ora), ?<(3,5) implies suggest(ora);
+Rule_1 :: range(3,ora1), ?<(3,5), range(3,ora1), ?<(2,3),  implies in_range(true,ora1);
+Rule_1 :: range(3,ora2), ?<(3,5), range(3,ora2), ?<(2,3),  implies in_range(true,ora2);
+Rule_1 :: mortality(8,ora2), ?<(8,10), mortality(8,ora2), ?<(5,8),  implies mortalityrate(high,ora2);
+Rule_1 :: mortality(9,ora1), ?<(9,10), mortality(9,ora1), ?<(5,9),  implies mortalityrate(high,ora1);
+first_class :: mortalityrate(high,ora1), in_range(true,ora1) implies suggest(ora1);
+first_class :: mortalityrate(high,ora2), in_range(true,ora2) implies suggest(ora2);

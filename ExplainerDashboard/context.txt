@@ -1,2 +1,5 @@
-plant(ora,3);
-plant(para,11);
+mortality(9,ora1);
+range(3,ora1);
+
+mortality(8,ora2);
+range(3,ora2);

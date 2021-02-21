@@ -2,7 +2,8 @@ import { AfterViewInit, Component, ViewChild } from '@angular/core';
 import * as AspNetData from "devextreme-aspnet-data-nojquery";
 import MojsCurveEditor from '@mojs/curve-editor';
 import { SolutionService } from '../services/solution-service';
-import { DxDataGridComponent } from 'devextreme-angular';
+import { DxChartComponent, DxDataGridComponent, DxPivotGridComponent } from 'devextreme-angular';
+import CustomStore from 'devextreme/data/custom_store';
 declare var mojs: any;
 
 @Component({
@@ -14,16 +15,21 @@ declare var mojs: any;
 export class HomeComponent implements AfterViewInit {
   demandColumns
   columns
-  dataSource
+  dataSource:CustomStore
   demandDataSource
   kb
   coach
   days
   currentDay = 1
+  companies
+  pivotGridDataSource
   @ViewChild('flockGrid', { static: false }) flockGrid : DxDataGridComponent;
   @ViewChild('demandGrid', { static: false }) demandGrid: DxDataGridComponent;
-  constructor(private solutionService: SolutionService) {
 
+  @ViewChild('pivotgrid', { static: false }) pivotGrid: DxPivotGridComponent;
+  @ViewChild('chart', { static: false }) chart: DxChartComponent;
+  constructor(private solutionService: SolutionService) {
+    this.companies = [{ "ID": 1, "name": "Flock Data" }, { "ID": 2, "name": "Pivot" }, { "ID": 3, "name": "Demand" }]
     this.days = [...Array(31).keys()];
     this.days.shift()
 
@@ -130,6 +136,10 @@ export class HomeComponent implements AfterViewInit {
       },
     });
 
+
+
+   
+
   }
   dayValueChange(ev) {
 
@@ -142,28 +152,52 @@ export class HomeComponent implements AfterViewInit {
 
   ngAfterViewInit() {
 
-    //const curveEditor = new MojsCurveEditor({
-    //  // name of the curve editor
-    //  name: 'bounce curve',
 
-    //  // if should preserve state on page reloads
-    //  isSaveState: false,
+    setTimeout(() => {
 
-    //  // start path - will be loaded on initialization of the curve,
-    //  // e.g. before any user modifications were made. Path of 'M0, 100 L100, 0' is set by default.
-    //  startPath: 'M0, 100 L100, 0',
+      this.pivotGrid.instance.bindChart(this.chart.instance, {
+        dataFieldsDisplayMode: "splitPanes",
+        alternateDataFields: false
+      });
+      var dataSource = this.pivotGrid.instance.getDataSource();
+      dataSource.expandHeaderItem('row', ['North America']);
+      dataSource.expandHeaderItem('column', [2013]);
 
-    //  easing:"M0, 100 C0, 100 30, 25 30, 25 C30, 25 60, 70 60, 70 C60, 70 100, 0 100, 0",
 
-    //  // callback on path change, accepts path string
-    //  onChange: function (path) {
-    //    console.log(path)
-    //  },
+      this.pivotGridDataSource = {
+        fields: [{
+          caption: "day",
+          width: 120,
+          dataField: "day",
+          area: "row",
+          sortBySummaryField: "Total"
+        },
 
-    //  // if should hide when minimized - useful when you try to embed
-    //  isHiddenOnMin: false
-    //});
-
+          //  {
+          //  caption: "City",
+          //  dataField: "city",
+          //  width: 150,
+          //  area: "row"
+          //}, {
+          //  dataField: "date",
+          //  dataType: "date",
+          //  area: "column"
+          //}, {
+          //  groupName: "date",
+          //  groupInterval: "month",
+          //  visible: false
+          //}, {
+          //  caption: "Total",
+          //  dataField: "amount",
+          //  dataType: "number",
+          //  summaryType: "sum",
+          //  format: "currency",
+          //  area: "data"
+          //}
+        ],
+        store: this.flockGrid.instance.getDataSource().items()
+      }
+    }, 1000);
 
   }
 }

@@ -37,8 +37,8 @@ namespace ExplainerDashboard.Controllers
             var sol = collection.Find(filter)
                                  .SingleOrDefault();
 
-            System.IO.File.WriteAllText("kb.txt", sol.Kb);
-            System.IO.File.WriteAllText("context.txt", sol.Coach);
+            System.IO.File.WriteAllText("kb.txt", string.Join('\n',sol.Kb.Split('\n').Where(s=>!s.StartsWith('#'))));
+            System.IO.File.WriteAllText("context.txt", string.Join('\n', sol.Coach.Split('\n').Where(s => !s.StartsWith('#'))));
 
 
             var dt = new List<string>();

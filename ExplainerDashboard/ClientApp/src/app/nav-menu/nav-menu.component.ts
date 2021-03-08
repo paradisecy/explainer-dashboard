@@ -29,6 +29,15 @@ export class NavMenuComponent {
     this.isExpanded = !this.isExpanded;
   }
 
+  initializeData(ev) {
+
+    this.solutionService
+      .initData()
+      .subscribe(s => {
+        location.reload();
+      })
+  }
+
   createSolution(ev) {
     this.popupVisible = true;
 
@@ -45,7 +54,7 @@ export class NavMenuComponent {
   removeSolution(ev) {
     this.solutionService
       .delete(this.solutionService.currentSolution)
-      .subscribe((s:any) => {
+      .subscribe((s: any) => {
         this.getSolutions()
         notify(s)
       })
@@ -54,7 +63,7 @@ export class NavMenuComponent {
   saveSolutions(ev) {
     this.solutionService
       .save(this.solutionService.currentSolution)
-      .subscribe((s:any) => {
+      .subscribe((s: any) => {
         notify(s.message)
       })
   }
@@ -63,14 +72,14 @@ export class NavMenuComponent {
 
     this.solutionService.get().subscribe(s => {
       this.solutions = s;
-     
+
     })
 
   }
 
   onCreateFormSubmit(ev) {
     console.log(this.newSolution)
-    this.solutionService.create(this.newSolution).subscribe((s:any) => {
+    this.solutionService.create(this.newSolution).subscribe((s: any) => {
       this.getSolutions()
 
       this.popupVisible = false;
@@ -83,7 +92,10 @@ export class NavMenuComponent {
   }
 
   handleValueChange(ev) {
-    this.solution = ev.value;
-    this.solutionService.currentSolution = this.solutions.filter(f => f.id === ev.value)[0];
+    this.solutionService.get().subscribe(s => {
+      this.solutions = s;
+      this.solution = ev.value;
+      this.solutionService.currentSolution = this.solutions.filter(f => f.id === ev.value)[0];
+    })
   }
 }

@@ -1,3 +1,4 @@
+using ExplainerDashboard.Model;
 using ExplainerDashboard.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -85,6 +86,19 @@ namespace ExplainerDashboard
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
+
+
+            //var m = app.ApplicationServices.GetService<IMongoService>();
+            //var c = m.Database.GetCollection<Flock>("flocks");
+            //c.Find(f => true).ForEachAsync(f =>
+            //{
+
+            //    f.Day = f.GrowingDay;   
+            //     c.ReplaceOneAsync(
+            //            Builders<Flock>.Filter.Eq(e => e.Id, f.Id), f);
+
+
+            //});
         }
     }
 }

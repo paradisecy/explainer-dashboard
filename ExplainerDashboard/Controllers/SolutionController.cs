@@ -16,9 +16,11 @@ namespace ExplainerDashboard.Controllers
     public class SolutionController : ControllerBase
     {
         private IMongoService _mongoService;
+        private DataController _dataCtrl;
         public SolutionController(IMongoService mongoService)
         {
             _mongoService = mongoService;
+            _dataCtrl = new DataController(mongoService);
         }
 
         [HttpGet("get-solutions")]
@@ -31,6 +33,36 @@ namespace ExplainerDashboard.Controllers
                 .ToListAsync();
 
             return Ok(data);
+        }
+
+        [HttpGet("generate-context")]
+        public async Task<IActionResult> GenerateContext(int day,string solutionId)
+        {
+            var collectionSol = _mongoService.Database.GetCollection<Solution>("solutions");
+
+            var sol = collectionSol.Find(f => f.Id == solutionId).FirstOrDefault();
+
+
+            var data = _dataCtrl.GetFlockUpdated(day).Result;
+            var context = new List<string>();
+
+            data.ForEach(entry =>
+            {
+
+                var plant = entry.PlantName;
+                context.Add($"quantity({entry.LiveChickQuantity},{plant});");
+                context.Add($"fcr({Math.Round(entry.Fcr,2)},{plant});");
+                context.Add($"weight({Math.Round(entry.AverageWeight,2)},{plant});");
+                context.Add($"mortality({Math.Round(entry.MortalityRate, 2)},{plant});");
+                context.Add($"cv({entry.VarationClass},{plant});");
+
+            });
+
+            var cnt = string.Join('\n', context);
+            sol.Coach = cnt;
+            var res = Save(sol).Result;
+
+            return Ok(new { result = cnt });
         }
 
         [HttpPost("create-solution")]
@@ -67,6 +99,8 @@ namespace ExplainerDashboard.Controllers
 
             return Ok(new { message = $"Solution {sol.Name} saved successfully" });
         }
+
+
 
 
     }

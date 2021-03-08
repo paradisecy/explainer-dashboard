@@ -7,17 +7,15 @@ using System.Threading.Tasks;
 
 namespace ExplainerDashboard.Model
 {
-    public class Solution
+    public class Decision
     {
         [BsonId]
         [BsonIgnoreIfDefault]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
-        public string Name { get; set; }
-        public string Kb { get; set; }
-        public string Coach { get; set; }
-        public string RawInference { get; set; }
-        public string Suggest { get; set; }
-        public string Explain { get; set; }
+        public int Day { get; set; }
+        public int Quantity { get; set; }
+        public string Plant { get; set; }
+
     }
 }

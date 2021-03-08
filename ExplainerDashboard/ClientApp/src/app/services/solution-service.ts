@@ -8,6 +8,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 export class SolutionService  {
   baseController = 'solution';
   processController = 'process';
+  flockController = 'data';
   currentSolution:any = {id:"0", name : "", kb: "" , coach :"", explain : ""}
   constructor(private http: HttpClient) {
   }
@@ -40,5 +41,21 @@ export class SolutionService  {
   get(): Observable<object> {
     return this.http.get(`${this.baseController}/get-solutions`);
   }
+
+  generateContext(day): Observable<object> {
+    return this.http.get(`${this.baseController}/generate-context?day=${day}&solutionId=${this.currentSolution.id}`);
+  }
+
+
+  getFlock(): Observable<object> {
+    return this.http.get(`${this.flockController}/get-all-flocks`);
+  }
+
+
+
+  initData(): Observable<object> {
+    return this.http.get(`${this.flockController}/intitlize-flocks`);
+  }
+
 
 }

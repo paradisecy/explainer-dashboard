@@ -2,7 +2,7 @@
 <dx-box direction="row"
         width="100%"
         [height]="1000">
-  <dxi-item [ratio]="1">
+  <dxi-item [ratio]="2">
     <dx-box direction="row"
             width="100%"
             [height]="400">
@@ -41,6 +41,7 @@
               </div>
               <div *dxTemplate="let company of 'item'">
                 <dx-data-grid [hidden]="company.ID !== 1" #flockGrid
+                              (onCellPrepared)="onCellPrepared($event)"
                               id="flockGrid"
                               [showBorders]="true"
                               [dataSource]="dataSource"
@@ -52,65 +53,117 @@
                   <dxo-search-panel [visible]="true"></dxo-search-panel>
                   <dxo-filter-row [visible]="true"></dxo-filter-row>
 
-                  <dxo-editing mode="row"
+                  <dxo-editing mode="batch"
                                [allowUpdating]="true"
                                [allowAdding]="true"
                                [allowDeleting]="true">
                   </dxo-editing>
                   <dxo-selection mode="single"></dxo-selection>
                 </dx-data-grid>
+                <div *ngIf="company.ID === 3">
+                  <dx-data-grid  #demandGrid
+                                id="demandGrid"
+                                [showBorders]="true"
+                                [dataSource]="demandDataSource"
+                                [columns]="demandColumns"
+                                [allowColumnResizing]="true"
+                                [columnAutoWidth]="true">
 
-                <dx-data-grid [hidden]="company.ID !== 3" #demandGrid
-                              id="demandGrid"
-                              [showBorders]="true"
-                              [dataSource]="demandDataSource"
-                              [columns]="demandColumns"
-                              [allowColumnResizing]="true"
-                              [columnAutoWidth]="true">
+                    <dxo-export [enabled]="true" fileName="file"></dxo-export>
+                    <dxo-search-panel [visible]="true"></dxo-search-panel>
+                    <dxo-filter-row [visible]="true"></dxo-filter-row>
 
-                  <dxo-export [enabled]="true" fileName="file"></dxo-export>
-                  <dxo-search-panel [visible]="true"></dxo-search-panel>
-                  <dxo-filter-row [visible]="true"></dxo-filter-row>
+                    <dxo-editing mode="batch"
+                                 [allowUpdating]="true"
+                                 [allowAdding]="true"
+                                 [allowDeleting]="true">
+                    </dxo-editing>
+                    <dxo-selection mode="single"></dxo-selection>
+                  </dx-data-grid>
+                  </div>
+                  <div *ngIf="company.ID === 4">
 
-                  <dxo-editing mode="row"
-                               [allowUpdating]="true"
-                               [allowAdding]="true"
-                               [allowDeleting]="true">
-                  </dxo-editing>
-                  <dxo-selection mode="single"></dxo-selection>
-                </dx-data-grid>
+                    <dx-data-grid #decisionGrid
+                                  id="decisionGrid"
+                                  [showBorders]="true"
+                                  [dataSource]="decisionDataSource"
+                                  [columns]="decisionColumns"
+                                  [allowColumnResizing]="true"
+                                  [columnAutoWidth]="true">
+
+                      <dxo-export [enabled]="true" fileName="file"></dxo-export>
+                      <dxo-search-panel [visible]="true"></dxo-search-panel>
+                      <dxo-filter-row [visible]="true"></dxo-filter-row>
+
+                      <dxo-editing mode="batch"
+                                   [allowUpdating]="true"
+                                   [allowAdding]="true"
+                                   [allowDeleting]="true">
+                      </dxo-editing>
+                      <dxo-selection mode="single"></dxo-selection>
+                    </dx-data-grid>
+
+                  </div>
+                  <div *ngIf="company.ID === 2">
+
+                    <dx-chart id="chart">
+                      <dxo-common-series-settings type="bar"></dxo-common-series-settings>
+                      <dxo-size [height]="500"></dxo-size>
+                      <dxo-adaptive-layout></dxo-adaptive-layout>
+                      <dxo-tooltip [enabled]="true" format="decimal"></dxo-tooltip>
+                    </dx-chart>
+                    <dx-pivot-grid #pivotgrid
+                                   [allowSortingBySummary]="true"
+                                   [allowFiltering]="true"
+                                   [allowSorting]="true"
+                                   [showBorders]="true"
+                                   [showColumnGrandTotals]="false"
+                                   [showRowGrandTotals]="true"
+                                   [showRowTotals]="true"
+                                   [showColumnTotals]="true"
+                                   [dataSource]="pivotGridDataSource"
+                                   (onContentReady)="onInitialized($event)">
+                      <dxo-header-filter [allowSearch]="true"
+                                         [showRelevantValues]="true"
+                                         [width]="300"
+                                         [height]="400"></dxo-header-filter>
+
+                      <dxo-field-panel [visible]="true">
+                      </dxo-field-panel>
+                      <dxo-field-chooser [enabled]="true" [height]="400"></dxo-field-chooser>
+                      <dxo-scrolling mode="virtual"></dxo-scrolling>
+                      <dxo-export [enabled]="true"></dxo-export>
+                    </dx-pivot-grid>
 
 
-                  <dx-chart  [hidden]="company.ID !== 2" #chart>
-                    <dxo-common-series-settings type="bar"></dxo-common-series-settings>
-                    <dxo-size [height]="200"></dxo-size>
-                    <dxo-adaptive-layout [width]="450"></dxo-adaptive-layout>
-                    <dxo-tooltip [enabled]="true" format="currency"></dxo-tooltip>
-                  </dx-chart>
+                  </div>
 
-                  <dx-pivot-grid  [hidden]="company.ID !== 2" #pivotgrid
-                                 [allowSortingBySummary]="true"
-                                 [allowFiltering]="true"
-                                 [showBorders]="true"
-                                 [allowSortingBySummary]="true"
-                                 [showColumnGrandTotals]="false"
-                                 [showRowGrandTotals]="false"
-                                 [showRowTotals]="false"
-                                 [showColumnTotals]="false"
-                                 [dataSource]="pivotGridDataSource">
-                    <dxo-field-chooser [enabled]="true" [height]="400"></dxo-field-chooser>
-                    <dxo-scrolling mode="virtual"></dxo-scrolling>
-                  </dx-pivot-grid>
-             
 
-              </div>
-            </dx-accordion>
+
+
+                </div>
+</dx-accordion>
             <dxi-item style="margin-top:15px;" [ratio]="4">
-              <h3>Explanation</h3>
-              <dx-text-area [height]="380"
-                            [maxLength]="maxLength"
-                            [(value)]="solutionService.currentSolution.explain">
-              </dx-text-area>
+           
+              <dx-box direction="row"
+                      width="100%"
+                      [height]="400">
+                <dxi-item [ratio]="1">
+                  <h3>Suggestion</h3>
+                  <dx-text-area [height]="380"
+                                [maxLength]="maxLength"
+                                [(value)]="solutionService.currentSolution.suggest">
+                  </dx-text-area>
+                </dxi-item>
+                <dxi-item [ratio]="1" style="margin-left:5px">
+                  <h3>Explanation</h3>
+                  <dx-text-area [height]="380"
+                                [maxLength]="maxLength"
+                                [(value)]="solutionService.currentSolution.explain">
+                  </dx-text-area>
+                </dxi-item>
+              </dx-box>
+
             </dxi-item>
           </dxi-item>
         </dx-box>
@@ -126,7 +179,13 @@
             width="98%"
             [height]="1000">
 
-      <dxi-item [ratio]="2" style="margin-top:60px">
+      <dxi-item [ratio]="2" style="margin-top:15px">
+        <dx-button style="margin-left: 15px;float:right"
+                   [width]="250"
+                   text="Generate Context From Data"
+                   (onClick)="generateContext($event)">
+
+        </dx-button>
         <h3 style="margin-left: 15px;margin-top: 15px">Context</h3>
         <dx-text-area style="margin-left:15px;margin-right:15px;"
                       [height]="380"

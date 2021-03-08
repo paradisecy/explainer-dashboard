@@ -4,6 +4,7 @@ import MojsCurveEditor from '@mojs/curve-editor';
 import { SolutionService } from '../services/solution-service';
 import { DxChartComponent, DxDataGridComponent, DxPivotGridComponent } from 'devextreme-angular';
 import CustomStore from 'devextreme/data/custom_store';
+import notify from 'devextreme/ui/notify';
 declare var mojs: any;
 
 @Component({
@@ -14,23 +15,32 @@ declare var mojs: any;
 
 export class HomeComponent implements AfterViewInit {
   demandColumns
+  decisionColumns
   columns
-  dataSource:CustomStore
+  dataSource: CustomStore
   demandDataSource
+  decisionDataSource
   kb
   coach
   days
   currentDay = 1
   companies
   pivotGridDataSource
-  @ViewChild('flockGrid', { static: false }) flockGrid : DxDataGridComponent;
+  @ViewChild('flockGrid', { static: false }) flockGrid: DxDataGridComponent;
   @ViewChild('demandGrid', { static: false }) demandGrid: DxDataGridComponent;
+  @ViewChild('decisionGrid', { static: false }) decisionGrid: DxDataGridComponent;
 
   @ViewChild('pivotgrid', { static: false }) pivotGrid: DxPivotGridComponent;
-  @ViewChild('chart', { static: false }) chart: DxChartComponent;
+  @ViewChild(DxChartComponent, { static: false }) chart: DxChartComponent;
   constructor(private solutionService: SolutionService) {
-    this.companies = [{ "ID": 1, "name": "Flock Data" }, { "ID": 2, "name": "Pivot" }, { "ID": 3, "name": "Demand" }]
-    this.days = [...Array(31).keys()];
+    this.companies = [
+      { "ID": 1, "name": "Flock Data" },
+      { "ID": 2, "name": "Pivot" },
+      { "ID": 3, "name": "Demand" },
+      { "ID": 4, "name": "Decision" }
+    ];
+
+    this.days = [...Array(50).keys()];
     this.days.shift()
 
     this.columns = [
@@ -65,6 +75,9 @@ export class HomeComponent implements AfterViewInit {
         dataField: "averageWeight", caption: "Avg Weight"
       },
       {
+        dataField: "targetWeight", caption: "Target Weight"
+      },
+      {
         dataField: "distance", caption: "Distance"
       },
       {
@@ -94,6 +107,20 @@ export class HomeComponent implements AfterViewInit {
         dataField: "toWeight", caption: "To Weight"
       },
     ];
+
+
+    this.decisionColumns = [
+      {
+        dataField: "day", caption: "Day"
+      },
+      {
+        dataField: "plant", caption: "Plant"
+      },
+      {
+        dataField: "quantity", caption: "Qty"
+      },
+    ];
+
 
 
     this.dataSource = AspNetData.createStore({
@@ -138,66 +165,159 @@ export class HomeComponent implements AfterViewInit {
 
 
 
-   
+    this.decisionDataSource = AspNetData.createStore({
+      key: "id",
+      loadUrl: "/decision/get-decisions",
+      insertUrl: "/decision/create-decision",
+      updateUrl: "/decision/update-decision",
+      deleteUrl: "/decision/delete-decision",
+
+
+      onBeforeSend: (method, ajaxOptions) => {
+        if (method === "load") {
+          ajaxOptions.url = ajaxOptions.url + `?day=${this.currentDay}`;
+        }
+      },
+
+      onAjaxError(response) {
+        console.log(response)
+
+      },
+    });
+
+
+
 
   }
+
+
+
+  onCellPrepared(cellInfo) {
+    if (cellInfo.rowType == "data" && cellInfo.column.dataField === 'averageWeight') {
+      if (cellInfo.data.averageWeight < cellInfo.data.targetWeight) {
+        cellInfo.cellElement.style.color ='red';
+      }
+    }
+  }
+
   dayValueChange(ev) {
 
     this.currentDay = ev.value;
+    this.decisionGrid.instance.getDataSource().reload();
     this.demandGrid.instance.getDataSource().reload();
     this.flockGrid.instance.getDataSource().reload();
 
+
+    this.pivotInit()
+
   }
 
+  generateContext(ev) {
+    this.solutionService
+      .generateContext(this.currentDay)
+      .subscribe((data:any) => {
 
+
+        this.solutionService.currentSolution.coach = data.result;
+
+      })
+  }
+
+  pivotInit() {
+      this.solutionService.getFlock().subscribe(data => {
+        this.pivotGridDataSource = {
+          fields:
+            [
+              {
+                caption: "Group",
+                dataField: "group",
+                width: 150,
+                area: "row"
+              },
+              {
+                caption: "Grow Day",
+                dataField: "growingDay",
+                width: 150,
+                area: "row"
+              },
+              {
+                dataField: "growingDay",
+                width: 150,
+                area: "filter"
+              },
+       
+              {
+                caption: "Plant",
+                dataField: "plantName",
+                width: 150,
+                area: "row"
+              },
+              {
+                caption: "Plant",
+                dataField: "plantName",
+                width: 150,
+                area: "filter"
+              },
+              {
+                caption: "Group",
+                dataField: "group",
+                width: 150,
+                area: "column"
+              },
+              {
+                caption: "CV",
+                dataField: "coefficientVariation",
+                summaryType: "avg",
+                format: { type: 'fixedPoint', precision: 2 },
+                area: "data"
+              },
+              {
+                caption: "FCR",
+                dataField: "fcr",
+                summaryType: "avg",
+                format: { type: 'fixedPoint', precision: 2 },
+                area: "data"
+              },
+              {
+                caption: "Mortality",
+                dataField: "mortalityRate",
+                summaryType: "avg",
+                format: { type: 'fixedPoint', precision: 2 },
+                area: "data"
+              },
+              {
+                caption: "Weight",
+                dataField: "averageWeight",
+                summaryType: "avg",
+                format: { type: 'fixedPoint', precision: 2 },
+                area: "data"
+              },
+              {
+                caption: "Qty",
+                dataField: "liveChickQuantity",
+                dataType: "number",
+                summaryType: "sum",
+                format: "decimal",
+                area: "data"
+              },
+
+            ],
+          store: data
+      }
+
+
+      })
+
+  }
+
+  onInitialized(ev) {
+    this.pivotGrid.instance.bindChart(this.chart.instance, {
+      dataFieldsDisplayMode: "splitPanes",
+      alternateDataFields: false
+    }); 
+  }
   ngAfterViewInit() {
 
-
-    setTimeout(() => {
-
-      this.pivotGrid.instance.bindChart(this.chart.instance, {
-        dataFieldsDisplayMode: "splitPanes",
-        alternateDataFields: false
-      });
-      var dataSource = this.pivotGrid.instance.getDataSource();
-      dataSource.expandHeaderItem('row', ['North America']);
-      dataSource.expandHeaderItem('column', [2013]);
-
-
-      this.pivotGridDataSource = {
-        fields: [{
-          caption: "day",
-          width: 120,
-          dataField: "day",
-          area: "row",
-          sortBySummaryField: "Total"
-        },
-
-          //  {
-          //  caption: "City",
-          //  dataField: "city",
-          //  width: 150,
-          //  area: "row"
-          //}, {
-          //  dataField: "date",
-          //  dataType: "date",
-          //  area: "column"
-          //}, {
-          //  groupName: "date",
-          //  groupInterval: "month",
-          //  visible: false
-          //}, {
-          //  caption: "Total",
-          //  dataField: "amount",
-          //  dataType: "number",
-          //  summaryType: "sum",
-          //  format: "currency",
-          //  area: "data"
-          //}
-        ],
-        store: this.flockGrid.instance.getDataSource().items()
-      }
-    }, 1000);
-
+    this.pivotInit()
   }
 }

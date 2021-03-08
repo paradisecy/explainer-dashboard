@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ExplainerDashboard.Controllers
@@ -37,7 +38,7 @@ namespace ExplainerDashboard.Controllers
             var sol = collection.Find(filter)
                                  .SingleOrDefault();
 
-            System.IO.File.WriteAllText("kb.txt", string.Join('\n',sol.Kb.Split('\n').Where(s=>!s.StartsWith('#'))));
+            System.IO.File.WriteAllText("kb.txt", string.Join('\n', sol.Kb.Split('\n').Where(s => !s.StartsWith('#'))));
             System.IO.File.WriteAllText("context.txt", string.Join('\n', sol.Coach.Split('\n').Where(s => !s.StartsWith('#'))));
 
 
@@ -46,29 +47,42 @@ namespace ExplainerDashboard.Controllers
             clientProcess.StartInfo.FileName = @"exec.bat";
             clientProcess.StartInfo.UseShellExecute = false;
             clientProcess.StartInfo.RedirectStandardOutput = true;
-            clientProcess.OutputDataReceived += (sender, args) => {
+            clientProcess.OutputDataReceived += (sender, args) =>
+            {
 
                 dt.Add(args.Data);
             };
 
 
-   
+
             clientProcess.Start();
             clientProcess.BeginOutputReadLine();
 
 
-    
+
 
             clientProcess.WaitForExit();
             int code = clientProcess.ExitCode;
             var dtt = dt.Skip(2).SkipLast(1);
 
-            sol.Explain = string.Join("\n", dtt);
+            var raw = string.Join("\n", dtt);
+
+
+            Regex pattern = new Regex(@"(\[(?:\[??[^\[]*?\]))");
+            Match match = pattern.Match(raw);
+            if (match.Success) {
+
+                var len = match.Groups[0].Value.Length;
+                sol.Suggest = raw.Substring(0, len);
+                sol.Explain = raw.Substring(len + 1, raw.Length - len - 1);
+                sol.RawInference = raw;
+            }
 
             await collection.ReplaceOneAsync(
                     Builders<Solution>.Filter.Eq(e => e.Id, solution.Id), sol);
 
             return Ok(sol);
         }
+
     }
 }

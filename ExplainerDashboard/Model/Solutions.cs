@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace ExplainerDashboard.Model
 {
+    public class SuggestedPlant
+    {
+        public string Plant { get; set; }
+        public string Group { get; set; }
+    }
+
     public class Solution
     {
         [BsonId]
@@ -19,5 +25,9 @@ namespace ExplainerDashboard.Model
         public string RawInference { get; set; }
         public string Suggest { get; set; }
         public string Explain { get; set; }
+
+        public string SuggestedPlants { get; set; }
+
+        public List<string> SuggestedPlantsList { get; set; }
     }
 }

@@ -1,6 +1,3 @@
-Rule_1 :: range(3,ora1), ?<(3,5), range(3,ora1), ?<(2,3),  implies in_range(true,ora1);
-Rule_1 :: range(3,ora2), ?<(3,5), range(3,ora2), ?<(2,3),  implies in_range(true,ora2);
-Rule_1 :: mortality(8,ora2), ?<(8,10), mortality(8,ora2), ?<(5,8),  implies mortalityrate(high,ora2);
-Rule_1 :: mortality(9,ora1), ?<(9,10), mortality(9,ora1), ?<(5,9),  implies mortalityrate(high,ora1);
-first_class :: mortalityrate(high,ora1), in_range(true,ora1) implies suggest(ora1);
-first_class :: mortalityrate(high,ora2), in_range(true,ora2) implies suggest(ora2);
+EnoughCapacity :: quantity(24983,7121), ?<(24000,24983), quantity(24983,7121), ?<(24983,25000),  implies suggest(7121);
+EnoughCapacity :: quantity(24966,6722), ?<(24000,24966), quantity(24966,6722), ?<(24966,25000),  implies suggest(6722);
+EnoughCapacity :: quantity(24933,6932), ?<(24000,24933), quantity(24933,6932), ?<(24933,25000),  implies suggest(6932);

@@ -17,7 +17,7 @@ import { MatCardModule } from '@angular/material/card/';
 import { DxSelectBoxModule } from 'devextreme-angular/ui/select-box';
 import { DxButtonModule } from 'devextreme-angular/ui/button';
 import { DxPopupModule } from 'devextreme-angular/ui/popup';
-import { DxAccordionModule, DxChartModule, DxFormModule, DxPivotGridModule } from 'devextreme-angular';
+import { DxAccordionModule, DxChartModule, DxFormModule, DxListComponent, DxListModule, DxPivotGridModule } from 'devextreme-angular';
 
 @NgModule({
   declarations: [
@@ -42,10 +42,9 @@ import { DxAccordionModule, DxChartModule, DxFormModule, DxPivotGridModule } fro
     DxButtonModule,
     DxPivotGridModule,
     DxChartModule,
+    DxListModule,
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'counter', component: CounterComponent },
-      { path: 'fetch-data', component: FetchDataComponent },
     ]),
     BrowserAnimationsModule
   ],

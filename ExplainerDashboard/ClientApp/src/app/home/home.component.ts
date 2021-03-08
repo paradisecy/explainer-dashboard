@@ -26,12 +26,13 @@ export class HomeComponent implements AfterViewInit {
   currentDay = 1
   companies
   pivotGridDataSource
+  selectedItems
   @ViewChild('flockGrid', { static: false }) flockGrid: DxDataGridComponent;
   @ViewChild('demandGrid', { static: false }) demandGrid: DxDataGridComponent;
   @ViewChild('decisionGrid', { static: false }) decisionGrid: DxDataGridComponent;
 
-  @ViewChild('pivotgrid', { static: false }) pivotGrid: DxPivotGridComponent;
-  @ViewChild(DxChartComponent, { static: false }) chart: DxChartComponent;
+  @ViewChild('pivotGrid', { static: false }) pivotGrid: DxPivotGridComponent;
+  @ViewChild('chart', { static: false }) chart: DxChartComponent;
   constructor(private solutionService: SolutionService) {
     this.companies = [
       { "ID": 1, "name": "Flock Data" },
@@ -186,7 +187,7 @@ export class HomeComponent implements AfterViewInit {
     });
 
 
-
+    this.selectedItems = [this.companies[0]]
 
   }
 
@@ -224,7 +225,7 @@ export class HomeComponent implements AfterViewInit {
   }
 
   pivotInit() {
-      this.solutionService.getFlock().subscribe(data => {
+    this.solutionService.getFlock().subscribe(data => {
         this.pivotGridDataSource = {
           fields:
             [
@@ -232,31 +233,38 @@ export class HomeComponent implements AfterViewInit {
                 caption: "Group",
                 dataField: "group",
                 width: 150,
-                area: "row"
+                area: "row",
+                expanded: true,
               },
               {
                 caption: "Grow Day",
                 dataField: "growingDay",
                 width: 150,
-                area: "row"
+                area: "row",
+                expanded: true,
               },
               {
                 dataField: "growingDay",
                 width: 150,
-                area: "filter"
+                area: "filter",
+                filterType: 'include',
+                filterValues: [this.currentDay]
               },
        
               {
                 caption: "Plant",
                 dataField: "plantName",
                 width: 150,
-                area: "row"
+                area: "row",
+                expanded: true,
               },
               {
                 caption: "Plant",
                 dataField: "plantName",
                 width: 150,
-                area: "filter"
+                area: "filter",
+                filterType: 'include',
+                filterValues: this.solutionService.currentSolution.suggestedPlantsList
               },
               {
                 caption: "Group",
@@ -304,20 +312,54 @@ export class HomeComponent implements AfterViewInit {
             ],
           store: data
       }
-
-
       })
 
   }
 
+  customizeTooltip(args) {
+
+    var l = args.seriesName.split("-")
+    var plant = l[l.length -1].split("|")[0]
+
+
+
+    return {
+      html: `Plant ${plant} | ${args.valueText}`
+    };
+  }
+
   onInitialized(ev) {
-    this.pivotGrid.instance.bindChart(this.chart.instance, {
-      dataFieldsDisplayMode: "splitPanes",
-      alternateDataFields: false
-    }); 
+
+    try {
+      this.pivotGrid.instance.bindChart(this.chart.instance, {
+        dataFieldsDisplayMode: "splitPanes",
+        alternateDataFields: true,
+        inverted: false,
+        customizeSeries: function (seriesName, seriesOptions) {
+          // Change series properties here
+          return seriesOptions; // This line is optional
+        },
+       customizeChart: function (chartOptions) {
+          // Change chart properties here
+          return chartOptions; // This line is optional
+        }
+      });
+      this.chart.instance.element().scrollIntoView();
+    } catch (e) {
+
+    }
+
   }
   ngAfterViewInit() {
-
     this.pivotInit()
+  }
+
+  ngOnInit() {
+    this.solutionService.reloadPivot.subscribe((result: boolean) => {
+      this.pivotInit()
+
+      this.selectedItems = [this.companies[1]]
+
+    });
   }
 }

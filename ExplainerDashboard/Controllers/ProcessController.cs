@@ -78,6 +78,10 @@ namespace ExplainerDashboard.Controllers
                 sol.RawInference = raw;
             }
 
+            sol.SuggestedPlants = System.IO.File.ReadAllText("moves.txt");
+            sol.SuggestedPlantsList = sol.SuggestedPlants.Split('\n')
+                .Where(w => !string.IsNullOrEmpty(w)).ToList();
+
             await collection.ReplaceOneAsync(
                     Builders<Solution>.Filter.Eq(e => e.Id, solution.Id), sol);
 

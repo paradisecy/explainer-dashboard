@@ -1,9 +1,1 @@
-first_class:: mortalityrate(high,P), in_range(true,P) implies suggest(P);
-
-
-Rule_1 :: mortality(Q,P), ?<(Q,5), mortality(Q,P), ?<(2,Q) implies mortalityrate(normal,P);
-Rule_1 :: mortality(Q,P), ?<(Q,10), mortality(Q,P), ?<(5,Q) implies mortalityrate(high,P);
-
-
-Rule_1 :: range(Q,P), ?<(Q,5), range(Q,P), ?<(2,Q) implies in_range(true,P);
-
+EnoughCapacity :: quantity(T,P), ?<(24000,T), quantity(T,P), ?<(T,25000) implies suggest(P);

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Injectable({
@@ -9,7 +9,8 @@ export class SolutionService  {
   baseController = 'solution';
   processController = 'process';
   flockController = 'data';
-  currentSolution:any = {id:"0", name : "", kb: "" , coach :"", explain : ""}
+  currentSolution: any = { id: "0", name: "", kb: "", coach: "", explain: "" }
+  reloadPivot: BehaviorSubject<boolean> = new BehaviorSubject(false);
   constructor(private http: HttpClient) {
   }
 
@@ -50,7 +51,6 @@ export class SolutionService  {
   getFlock(): Observable<object> {
     return this.http.get(`${this.flockController}/get-all-flocks`);
   }
-
 
 
   initData(): Observable<object> {

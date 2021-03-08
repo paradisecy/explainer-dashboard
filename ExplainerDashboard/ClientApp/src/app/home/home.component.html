@@ -35,7 +35,8 @@
                           [collapsible]="true"
                           [multiple]="false"
                           [animationDuration]="300"
-                          [selectedItems]="[companies[0]]">
+                          [deferRendering]="false"
+                          [selectedItems]="selectedItems">
               <div *dxTemplate="let company of 'title'">
                 <h1>{{company.name}}</h1>
               </div>
@@ -61,7 +62,7 @@
                   <dxo-selection mode="single"></dxo-selection>
                 </dx-data-grid>
                 <div *ngIf="company.ID === 3">
-                  <dx-data-grid  #demandGrid
+                  <dx-data-grid #demandGrid
                                 id="demandGrid"
                                 [showBorders]="true"
                                 [dataSource]="demandDataSource"
@@ -80,71 +81,74 @@
                     </dxo-editing>
                     <dxo-selection mode="single"></dxo-selection>
                   </dx-data-grid>
-                  </div>
-                  <div *ngIf="company.ID === 4">
+                </div>
+                <div *ngIf="company.ID === 4">
 
-                    <dx-data-grid #decisionGrid
-                                  id="decisionGrid"
-                                  [showBorders]="true"
-                                  [dataSource]="decisionDataSource"
-                                  [columns]="decisionColumns"
-                                  [allowColumnResizing]="true"
-                                  [columnAutoWidth]="true">
+                  <dx-data-grid #decisionGrid
+                                id="decisionGrid"
+                                [showBorders]="true"
+                                [dataSource]="decisionDataSource"
+                                [columns]="decisionColumns"
+                                [allowColumnResizing]="true"
+                                [columnAutoWidth]="true">
 
-                      <dxo-export [enabled]="true" fileName="file"></dxo-export>
-                      <dxo-search-panel [visible]="true"></dxo-search-panel>
-                      <dxo-filter-row [visible]="true"></dxo-filter-row>
+                    <dxo-export [enabled]="true" fileName="file"></dxo-export>
+                    <dxo-search-panel [visible]="true"></dxo-search-panel>
+                    <dxo-filter-row [visible]="true"></dxo-filter-row>
 
-                      <dxo-editing mode="batch"
-                                   [allowUpdating]="true"
-                                   [allowAdding]="true"
-                                   [allowDeleting]="true">
-                      </dxo-editing>
-                      <dxo-selection mode="single"></dxo-selection>
-                    </dx-data-grid>
+                    <dxo-editing mode="batch"
+                                 [allowUpdating]="true"
+                                 [allowAdding]="true"
+                                 [allowDeleting]="true">
+                    </dxo-editing>
+                    <dxo-selection mode="single"></dxo-selection>
+                  </dx-data-grid>
 
-                  </div>
-                  <div *ngIf="company.ID === 2">
+                </div>
+                <div *ngIf="company.ID === 2">
 
-                    <dx-chart id="chart">
-                      <dxo-common-series-settings type="bar"></dxo-common-series-settings>
-                      <dxo-size [height]="500"></dxo-size>
-                      <dxo-adaptive-layout></dxo-adaptive-layout>
-                      <dxo-tooltip [enabled]="true" format="decimal"></dxo-tooltip>
-                    </dx-chart>
-                    <dx-pivot-grid #pivotgrid
-                                   [allowSortingBySummary]="true"
-                                   [allowFiltering]="true"
-                                   [allowSorting]="true"
-                                   [showBorders]="true"
-                                   [showColumnGrandTotals]="false"
-                                   [showRowGrandTotals]="true"
-                                   [showRowTotals]="true"
-                                   [showColumnTotals]="true"
-                                   [dataSource]="pivotGridDataSource"
-                                   (onContentReady)="onInitialized($event)">
-                      <dxo-header-filter [allowSearch]="true"
-                                         [showRelevantValues]="true"
-                                         [width]="300"
-                                         [height]="400"></dxo-header-filter>
+                  <dx-chart id="chart" #chart>
 
-                      <dxo-field-panel [visible]="true">
-                      </dxo-field-panel>
-                      <dxo-field-chooser [enabled]="true" [height]="400"></dxo-field-chooser>
-                      <dxo-scrolling mode="virtual"></dxo-scrolling>
-                      <dxo-export [enabled]="true"></dxo-export>
-                    </dx-pivot-grid>
+                    <dxo-common-series-settings type="bar"></dxo-common-series-settings>
+                    <dxo-size [height]="500" [width]="1200"></dxo-size>
+                    <dxo-adaptive-layout [width]="300"></dxo-adaptive-layout>
+                    <dxo-tooltip [enabled]="true" [customizeTooltip]="customizeTooltip" format="decimal"></dxo-tooltip>
+                  </dx-chart>
+                  <dx-pivot-grid #pivotGrid
+                                 id="pivotGrid"
+                                 [allowSortingBySummary]="true"
+                                 [allowFiltering]="true"
+                                 [allowSorting]="true"
+                                 [showBorders]="true"
+                                 [allowExpandAll]="true"
+                                 [showColumnGrandTotals]="false"
+                                 [showRowGrandTotals]="true"
+                                 [showRowTotals]="true"
+                                 [showColumnTotals]="true"
+                                 [dataSource]="pivotGridDataSource"
+                                 (onContentReady)="onInitialized($event)">
+                    <dxo-header-filter [allowSearch]="true"
+                                       [showRelevantValues]="true"
+                                       [width]="300"
+                                       [height]="400"></dxo-header-filter>
 
-
-                  </div>
-
-
+                    <dxo-field-panel [visible]="true">
+                    </dxo-field-panel>
+                    <dxo-field-chooser [enabled]="true" [height]="400"></dxo-field-chooser>
+                    <dxo-scrolling mode="virtual"></dxo-scrolling>
+                    <dxo-export [enabled]="true"></dxo-export>
+                  </dx-pivot-grid>
 
 
                 </div>
-</dx-accordion>
+
+
+
+
+              </div>
+            </dx-accordion>
             <dxi-item style="margin-top:15px;" [ratio]="4">
-           
+
               <dx-box direction="row"
                       width="100%"
                       [height]="400">
@@ -161,6 +165,12 @@
                                 [maxLength]="maxLength"
                                 [(value)]="solutionService.currentSolution.explain">
                   </dx-text-area>
+                </dxi-item>
+                <dxi-item [ratio]="1" style="margin-left:5px">
+                  <h3>Suggested Plants</h3>
+                  <dx-list [items]="solutionService.currentSolution.suggestedPlantsList"
+                           [height]="400">
+                  </dx-list>
                 </dxi-item>
               </dx-box>
 

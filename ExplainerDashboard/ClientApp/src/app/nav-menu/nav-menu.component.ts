@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { SolutionService } from '../services/solution-service';
 import notify from 'devextreme/ui/notify';
 
 @Component({
   selector: 'app-nav-menu',
   templateUrl: './nav-menu.component.html',
-  styleUrls: ['./nav-menu.component.css']
+  styleUrls: ['./nav-menu.component.css'],
 })
 export class NavMenuComponent {
   constructor(private solutionService: SolutionService) {
@@ -48,6 +48,7 @@ export class NavMenuComponent {
       .process(this.solutionService.currentSolution)
       .subscribe(s => {
         this.solutionService.currentSolution = s;
+        this.solutionService.reloadPivot.next(true);
       })
   }
 

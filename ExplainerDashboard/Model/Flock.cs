@@ -18,10 +18,13 @@ namespace ExplainerDashboard.Model
         public string PlantName { get; set; }
         public string Group { get; set; }
         public decimal CoefficientVariation { get; set; }
+        public decimal AvgCoefficientVariation { get; set; }
         public string VarationClass { get; set; }
         public decimal Fcr { get; set; }
         public decimal Yield { get; set; }
         public decimal MortalityNo { get; set; }
+
+        public decimal AvgMortalityRate { get; set; }
         public decimal MortalityRate { get; set; }
         public int LiveChickQuantity { get; set; }
         public decimal AverageWeight { get; set; }
@@ -29,6 +32,15 @@ namespace ExplainerDashboard.Model
         public int Distance { get; set; }
         public decimal ClassAPercentage { get; set; }
         public decimal ClassBPercentage { get; set; }
+        public decimal FeedConsumption { get; set; }
+
+        public decimal TotalFeedConsumption { get; set; }
+
+        public decimal CostPerBird { get; set; }
+        public decimal Cost { get; set; }
+        public decimal TotalCostPerBird { get; set; }
+        public decimal TotalCost { get; set; }
+
 
 
     }

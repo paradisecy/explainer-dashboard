@@ -52,6 +52,10 @@ export class SolutionService  {
     return this.http.get(`${this.flockController}/get-all-flocks`);
   }
 
+  getBellCurve(mean,std): Observable<object> {
+    return this.http.get(`${this.flockController}/norm-dist?mean=${mean}&stddev=${std}`);
+  }
+
 
   initData(): Observable<object> {
     return this.http.get(`${this.flockController}/intitlize-flocks`);

@@ -1,3 +1,10 @@
-EnoughCapacity :: quantity(24983,7121), ?<(24000,24983), quantity(24983,7121), ?<(24983,25000),  implies suggest(7121);
-EnoughCapacity :: quantity(24966,6722), ?<(24000,24966), quantity(24966,6722), ?<(24966,25000),  implies suggest(6722);
-EnoughCapacity :: quantity(24933,6932), ?<(24000,24933), quantity(24933,6932), ?<(24933,25000),  implies suggest(6932);
+TargetWeight18-21 :: fcr(0.10038,4955), ?<(0.05,0.10038), weight(1.879,4955), ?<(1.8,1.879), weight(1.879,4955), ?<(1.879,2.1),  implies suggest(4955);
+TargetWeight18-21 :: fcr(0.08747,4748), ?<(0.05,0.08747), weight(1.805,4748), ?<(1.8,1.805), weight(1.805,4748), ?<(1.805,2.1),  implies suggest(4748);
+TargetWeight18-21 :: fcr(0.08145,5580), ?<(0.05,0.08145), weight(1.8705,5580), ?<(1.8,1.8705), weight(1.8705,5580), ?<(1.8705,2.1),  implies suggest(5580);
+TargetWeight18-21 :: fcr(0.12981,7293), ?<(0.05,0.12981), weight(1.828,7293), ?<(1.8,1.828), weight(1.828,7293), ?<(1.828,2.1),  implies suggest(7293);
+TargetWeight18-21 :: fcr(0.08061,5405), ?<(0.05,0.08061), weight(1.8915,5405), ?<(1.8,1.8915), weight(1.8915,5405), ?<(1.8915,2.1),  implies suggest(5405);
+TargetWeight18-21 :: fcr(0.10357,5597), ?<(0.05,0.10357), weight(1.887,5597), ?<(1.8,1.887), weight(1.887,5597), ?<(1.887,2.1),  implies suggest(5597);
+TargetWeight18-21 :: fcr(0.05527,4969), ?<(0.05,0.05527), weight(1.809,4969), ?<(1.8,1.809), weight(1.809,4969), ?<(1.809,2.1),  implies suggest(4969);
+TargetWeight18-21 :: fcr(0.09496,5259), ?<(0.05,0.09496), weight(1.862,5259), ?<(1.8,1.862), weight(1.862,5259), ?<(1.862,2.1),  implies suggest(5259);
+TargetWeight18-21 :: fcr(0.08336,6722), ?<(0.05,0.08336), weight(1.9525,6722), ?<(1.8,1.9525), weight(1.9525,6722), ?<(1.9525,2.1),  implies suggest(6722);
+TargetWeight18-21 :: fcr(0.08494,6932), ?<(0.05,0.08494), weight(1.925,6932), ?<(1.8,1.925), weight(1.925,6932), ?<(1.925,2.1),  implies suggest(6932);

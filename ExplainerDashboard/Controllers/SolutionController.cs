@@ -51,10 +51,11 @@ namespace ExplainerDashboard.Controllers
 
                 var plant = entry.PlantName;
                 context.Add($"quantity({entry.LiveChickQuantity},{plant});");
-                context.Add($"fcr({Math.Round(entry.Fcr,2)},{plant});");
-                context.Add($"weight({Math.Round(entry.AverageWeight,2)},{plant});");
-                context.Add($"mortality({Math.Round(entry.MortalityRate, 2)},{plant});");
+                context.Add($"fcr({Math.Round(entry.Fcr,5)},{plant});");
+                context.Add($"weight({Math.Round(entry.AverageWeight,5)},{plant});");
+                context.Add($"mortality({Math.Round(entry.MortalityRate, 5)},{plant});");
                 context.Add($"cv({entry.VarationClass},{plant});");
+                context.Add($"targetWeight({entry.TargetWeight},{plant});");
 
             });
 

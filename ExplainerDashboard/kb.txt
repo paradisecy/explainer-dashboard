@@ -1,1 +1,8 @@
-EnoughCapacity :: quantity(T,P), ?<(24000,T), quantity(T,P), ?<(T,25000) implies suggest(P);
+TargetWeight22-27 :: fcr(F,P), ?<(0.05,F), weight(T,P), ?<(2.2,T), weight(T,P), ?<(T,2.7) implies suggest(P);
+
+TargetWeight18-21 :: fcr(F,P), ?<(0.05,F), weight(T,P), ?<(1.8,T), weight(T,P), ?<(T,2.1) implies suggest(P);
+
+
+
+
+

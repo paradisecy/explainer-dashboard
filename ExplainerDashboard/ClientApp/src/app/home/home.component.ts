@@ -14,6 +14,10 @@ declare var mojs: any;
 })
 
 export class HomeComponent implements AfterViewInit {
+  costDataSource
+  costColumns
+  bellCurveData;
+  listSelectedItem = null;
   demandColumns
   decisionColumns
   columns
@@ -27,6 +31,9 @@ export class HomeComponent implements AfterViewInit {
   companies
   pivotGridDataSource
   selectedItems
+  lowAverage = 10
+  highAverage = 50
+  chart_visualRange = [1, 5];
   @ViewChild('flockGrid', { static: false }) flockGrid: DxDataGridComponent;
   @ViewChild('demandGrid', { static: false }) demandGrid: DxDataGridComponent;
   @ViewChild('decisionGrid', { static: false }) decisionGrid: DxDataGridComponent;
@@ -38,7 +45,8 @@ export class HomeComponent implements AfterViewInit {
       { "ID": 1, "name": "Flock Data" },
       { "ID": 2, "name": "Pivot" },
       { "ID": 3, "name": "Demand" },
-      { "ID": 4, "name": "Decision" }
+      { "ID": 4, "name": "Decision" },
+      { "ID": 5, "name": "Cost" }
     ];
 
     this.days = [...Array(50).keys()];
@@ -61,6 +69,12 @@ export class HomeComponent implements AfterViewInit {
         dataField: "coefficientVariation", caption: "CV"
       },
       {
+        dataField: "avgCoefficientVariation", caption: "CV Avg"
+      },
+      {
+        dataField: "varationClass", caption: "CV"
+      },
+      {
         dataField: "fcr", caption: "Fcr"
       },
       {
@@ -70,13 +84,34 @@ export class HomeComponent implements AfterViewInit {
         dataField: "mortalityRate", caption: "Mortality"
       },
       {
+        dataField: "avgMortalityRate", caption: "Avg Mortality"
+      },
+      {
         dataField: "liveChickQuantity", caption: "Qty"
       },
       {
         dataField: "averageWeight", caption: "Avg Weight"
       },
       {
+        dataField: "feedConsumption", caption: "Feed Consumption"
+      },
+      {
+        dataField: "totalFeedConsumption", caption: "Total Feed Consumption"
+      },
+      {
         dataField: "targetWeight", caption: "Target Weight"
+      },
+      {
+        dataField: "cost", caption: "Cost"
+      },
+      {
+        dataField: "costPerBird", caption: "Cost Per Bird"
+      },
+      {
+        dataField: "totalCostPerBird", caption: "Total Cost Per Bird"
+      },
+      {
+        dataField: "totalCost", caption: "Total Cost"
       },
       {
         dataField: "distance", caption: "Distance"
@@ -123,6 +158,19 @@ export class HomeComponent implements AfterViewInit {
     ];
 
 
+    this.costColumns = [
+      {
+        dataField: "dayFrom", caption: "Day From"
+      },
+      {
+        dataField: "dayTo", caption: "Day To"
+      },
+      {
+        dataField: "costPerKg", caption: "Cost Per Kg"
+      },
+    ];
+
+
 
     this.dataSource = AspNetData.createStore({
       key: "id",
@@ -150,6 +198,26 @@ export class HomeComponent implements AfterViewInit {
       insertUrl: "/demand/create-demand",
       updateUrl: "/demand/update-demand",
       deleteUrl: "/demand/delete-demand",
+
+
+      onBeforeSend: (method, ajaxOptions) => {
+        if (method === "load") {
+          ajaxOptions.url = ajaxOptions.url + `?day=${this.currentDay}`;
+        }
+      },
+
+      onAjaxError(response) {
+        console.log(response)
+
+      },
+    });
+
+    this.costDataSource = AspNetData.createStore({
+      key: "id",
+      loadUrl: "/cost/get-costs",
+      insertUrl: "/cost/create-cost",
+      updateUrl: "/cost/update-cost",
+      deleteUrl: "/cost/delete-cost",
 
 
       onBeforeSend: (method, ajaxOptions) => {
@@ -210,6 +278,7 @@ export class HomeComponent implements AfterViewInit {
 
 
     this.pivotInit()
+    this.generateContext(null)
 
   }
 
@@ -350,6 +419,22 @@ export class HomeComponent implements AfterViewInit {
     }
 
   }
+
+
+  onListSelectionChanged(ev) {
+    this.listSelectedItem = ev.addedItems[0]
+    var p = this.flockGrid.instance.getDataSource().items().filter(f => f.plantName === this.listSelectedItem)[0]
+    var std = (p.averageWeight * p.coefficientVariation) / 100
+    var mean = p.averageWeight;
+
+    this.solutionService.getBellCurve(mean, std).subscribe((s: any) => {
+
+      this.bellCurveData = s.points
+      this.chart_visualRange = [s.min,s.max]
+    })
+  }
+
+
   ngAfterViewInit() {
     this.pivotInit()
   }

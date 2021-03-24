@@ -25,9 +25,9 @@ namespace ExplainerDashboard.Controllers
 
 
         [HttpGet("get-flocks")]
-        public object GetFlocks(DataSourceLoadOptions loadOptions,int day)
+        public object GetFlocks(DataSourceLoadOptions loadOptions, int day)
         {
-            
+
 
             //var collection = _mongoService.Database.GetCollection<Flock>("flocks");
             //var filter = Builders<Flock>.Filter.Eq(s => s.Day, day);
@@ -59,29 +59,60 @@ namespace ExplainerDashboard.Controllers
 
             var collection = _mongoService.Database.GetCollection<Flock>("flocks");
             var collectionDecision = _mongoService.Database.GetCollection<Decision>("decisions");
+            var collectionCost = _mongoService.Database.GetCollection<FeedCost>("feedcost");
 
             var dataD = collectionDecision.Find(f => true)
                 .SortBy(s => s.Day)
                 .ThenBy(s => s.Plant)
                 .ToList();
 
-            var prevDecisions = dataD.GroupBy(g => new {g.Day, g.Plant }, (i, k) => new { day = i.Day  ,plant = i.Plant, sum = k.Sum(s => s.Quantity) });
+            var prevDecisions = dataD.GroupBy(g => new { g.Day, g.Plant }, (i, k) => new { day = i.Day, plant = i.Plant, sum = k.Sum(s => s.Quantity) });
+            var cost = collectionCost.Find(f => true).ToList();
 
-            var dataF = collection.Find(f=>true)
+            var dataF = collection.Find(f => true)
                 .SortBy(s => s.PlantName)
-                .ToList();
+                .ToList()
+                .Select(s =>
+                {
+
+                    var currentCost = cost.FirstOrDefault(f => f.DayFrom <= s.Day && f.DayTo >= s.Day).CostPerKg;
+                    s.FeedConsumption = Math.Round(s.Fcr * s.LiveChickQuantity * s.AverageWeight);
+                    s.Cost = currentCost * s.FeedConsumption;
+                    s.CostPerBird = s.Cost / s.LiveChickQuantity;
+                    return s;
+                });
+
+     
+            var dataP = collection.Find(f=>true)
+                .SortBy(s => s.PlantName)
+                .ToList()
+                .Select(s =>
+                {
+                    var currentCost = cost.FirstOrDefault(f => f.DayFrom <= s.Day && f.DayTo >= s.Day).CostPerKg;
+                    s.FeedConsumption = Math.Round(s.Fcr * s.LiveChickQuantity * s.AverageWeight);
+                    s.Cost = currentCost * s.FeedConsumption;
+                    s.CostPerBird = s.Cost / s.LiveChickQuantity;
+                    return s;
+                });
 
             var data = dataF.Select(f =>
             {
-                f.Fcr = Math.Round(f.Fcr, 2);
                 f.MortalityRate = Math.Round(f.MortalityRate, 6);
 
-                f.AvgCoefficientVariation = dataF.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Average(a => a.CoefficientVariation);
+                f.TotalFeedConsumption = dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Sum(a => a.FeedConsumption);
+                f.AvgMortalityRate = Math.Round(dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Average(a => a.MortalityRate), 6);
+                f.AvgCoefficientVariation = Math.Round(dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Average(a => a.CoefficientVariation), 2);
+
+                f.TotalCost = Math.Round(dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Sum(a => a.Cost), 4);
+                f.TotalCostPerBird = Math.Round(dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Sum(a => a.CostPerBird), 4);
 
                 if (prevDecisions.Any(a => f.Day > a.day && a.plant == f.PlantName))
                 {
-                    f.LiveChickQuantity = f.LiveChickQuantity - prevDecisions.Where(w => w.day < f.Day && w.plant == f.PlantName).Sum(s=>s.sum);
+                    f.LiveChickQuantity = f.LiveChickQuantity - prevDecisions.Where(w => w.day < f.Day && w.plant == f.PlantName).Sum(s => s.sum);
                 }
+
+                f.Fcr = f.TotalFeedConsumption / (f.LiveChickQuantity * f.AverageWeight);
+
                 return f;
             });
 
@@ -97,15 +128,12 @@ namespace ExplainerDashboard.Controllers
             var collectionCost = _mongoService.Database.GetCollection<FeedCost>("feedcost");
 
             var filterD = Builders<Decision>.Filter.Eq(s => s.Day, day);
-            var dataD = collectionDecision.Find(f=>true)
+            var dataD = collectionDecision.Find(f => true)
                 .SortByDescending(s => s.Day)
                 .ToList();
 
             var prevDecisions = dataD.Where(w => w.Day < day).GroupBy(g => g.Plant, (i, k) => new { plant = i, sum = k.Sum(s => s.Quantity) });
-
-
             var cost = collectionCost.Find(f => true).ToList();
-
 
 
             var filterF = Builders<Flock>.Filter.Eq(s => s.Day, day);
@@ -137,21 +165,22 @@ namespace ExplainerDashboard.Controllers
                     return s;
                 });
 
-            var data = dataF.Select(f=>
+            var data = dataF.Select(f =>
             {
-               
-                f.MortalityRate = Math.Round(f.MortalityRate, 6);
-        
-                f.TotalFeedConsumption = dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Sum(a => a.FeedConsumption);
-                f.AvgMortalityRate = Math.Round(dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Average(a => a.MortalityRate),6);
-                f.AvgCoefficientVariation = Math.Round(dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Average(a => a.CoefficientVariation),2);
 
-                f.TotalCost = Math.Round(dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Sum(a => a.Cost),4);
+                f.MortalityRate = Math.Round(f.MortalityRate, 6);
+
+                f.TotalFeedConsumption = dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Sum(a => a.FeedConsumption);
+                f.AvgMortalityRate = Math.Round(dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Average(a => a.MortalityRate), 6);
+                f.AvgCoefficientVariation = Math.Round(dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Average(a => a.CoefficientVariation), 2);
+
+                f.TotalCost = Math.Round(dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Sum(a => a.Cost), 4);
                 f.TotalCostPerBird = Math.Round(dataP.Where(s => s.Day <= f.Day && s.PlantName == f.PlantName).Sum(a => a.CostPerBird), 4);
 
-              
 
-                if (prevDecisions.Any(a => a.plant == f.PlantName)) {
+
+                if (prevDecisions.Any(a => a.plant == f.PlantName))
+                {
 
                     f.LiveChickQuantity = f.LiveChickQuantity - prevDecisions.First(p => p.plant == f.PlantName).sum;
                 }
@@ -219,7 +248,7 @@ namespace ExplainerDashboard.Controllers
         public async Task<IActionResult> Initialize()
         {
             var collection = _mongoService.Database.GetCollection<Flock>("flocks");
-            await collection.DeleteManyAsync(f=>true);
+            await collection.DeleteManyAsync(f => true);
 
 
             var collectionBc = _mongoService.Database.GetCollection<Flock>("flocks-bc");

@@ -1,0 +1,1 @@
+CMD.exe /C swipl init.pl

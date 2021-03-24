@@ -1,0 +1,6 @@
+
+r001 :: call_from(work) implies !reject.
+r002 :: call_from(home) implies !silent.
+r003 :: call_from(mother) implies !vibrate_mode.
+r004 :: call_from(n) implies !accept.
+r005 :: call_from(k) implies !sms('I am in meeting').

@@ -27,7 +27,7 @@ namespace ExplainerDashboard.Model
         public string Explain { get; set; }
 
         public string SuggestedPlants { get; set; }
-
+        public bool IsProlog { get; set; }
         public List<string> SuggestedPlantsList { get; set; }
     }
 }

@@ -1,0 +1,3 @@
+r001 :: query('restaurants',0),query('near',1),query('nicosia',2) implies !add('italian',0.5).
+r002 :: query('restaurants',0),query('near',1),query('nicosia',2) implies !delete(1).
+r003 :: query(_,_) implies !say('Done').

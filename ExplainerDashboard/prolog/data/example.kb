@@ -1,0 +1,23 @@
+r01 :: a, -z implies c.
+r02 :: a implies -c.
+r03 :: -c implies p.
+r04 :: -q implies p.
+r05 :: p implies -q.
+r06 :: -z implies -q.
+r07 :: r implies c.
+r08 :: r implies s.
+r09 :: s implies -t.
+r10 :: c implies -w.
+r11 :: -w implies e.
+r12 :: c implies -e.
+r13 :: -e implies w.
+r14 :: -z implies -y.
+r15 :: -z implies -y.
+r16 :: -y implies x.
+r17 :: -y implies x.
+r18 :: x implies w.
+r19 :: x implies w.
+r01 >> r02.
+r12 >> r11.
+r19 >> r10.
+r10 >> r18.

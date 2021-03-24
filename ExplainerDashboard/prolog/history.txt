@@ -1,0 +1,19 @@
+﻿2017-06-15: Initial version with implemented processes for
+reasoning, coaching, and explaining. Support for stand-alone
+operation, and service calls. Started working on filtering.
+
+2017-08-11: Updated syntax and semantics to support relational
+knowledge bases, and to include query and action terms. Fixed
+process of determining the crown rules for soundness, speed, and
+code reusability. Reduced explanations to one step for speed.
+
+2017-08-23: Derivations can now be depth-restricted. Encoded a
+knowledge base with causal and inertial reasoning, but not a
+general treatment. Included provisions for supporting learning.
+Initial attempt at writing meta knowledge about the operation.
+
+2018-01-09: Started working on adding a persuasion module. Update
+of service calls to handle inputs through the passing of filenames.
+
+2018-02-24: Various enhancements for speed. Created new example for
+an appointment assistant. Simplified screen printing functions.

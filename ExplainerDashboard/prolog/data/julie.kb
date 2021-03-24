@@ -1,0 +1,107 @@
+% Author: Loizos Michael
+% Date: 2018-01-16
+
+% ============= Julie, Appointment Assistant
+
+% Scenario 1: Ask to schedule an urgent appointment that ends up being over lunch.
+% Scenario 2: Ask to schedule an appointment after lunch that ends up being short.
+
+% ============= NL Policy
+
+% Assume: 1-hour slots, 1-day lookahead, restricted.
+% Appointment hours are between 11am and 2pm on workdays.
+% Lunch time is between noon and 1pm on workdays.
+% Preferences in order of importance:
+% 1. Execute an explicit command as it is given.
+% 2. Do not update / reschedule existing appointments.
+% 3. Do not schedule overlapping appointments.
+% 4. Schedule urgent appointments within 2 hours.
+%% 5a. Plan new short appointments to last 1 hour.
+%% 5b. Plan new appointments to last 2 hours.
+%% 6. Schedule appointments only during work hours.
+% 7. Do not schedule appointments during lunch time.
+% Among prefered slots, schedule during earliest one.
+
+% ============= Knowledge
+
+% S/E/P/W/D = start/end/point/window/distance, T/Q = time/quantized
+
+% ------------- entry(ID,L,(TS,TE)), time((Y,M,D,H,N))
+
+r001 :: time(TP), ?quantum(Q), ?quantize(TP,Q,ceiling,QP) implies present(QP).
+r002 :: entry(ID,L,(TS,TE)), ?quantum(Q), ?quantize(TS,Q,floor,QS), ?quantize(TE,Q,ceiling,QE) implies occupied(ID,L,(QS,QE)).
+
+r004 :: time((Y,M,D,_,_)), ?quantum(Q), ?quantize((Y,M,D,11,00),Q,floor,QS), ?quantize((Y,M,D,14,00),Q,ceiling,QE) implies workhours((QS,QE)).
+r005 :: time((Y,M,D,_,_)), ?quantum(Q), ?quantize((Y,M,D,12,00),Q,floor,QS), ?quantize((Y,M,D,13,00),Q,ceiling,QE) implies nextlunchtime((QS,QE)).
+
+r010 :: before(lunch), nextlunchtime((QS,QE)) implies preceding(QS).
+r011 :: after(lunch), nextlunchtime((QS,QE)) implies following(QE).
+
+r021 :: true implies -done.
+
+% ------------- schedule, title(L), before/after(TP/lunch), urgent, short, !create(L,TW).
+
+r101 :: schedule, present(QP), workhours((QS1,QE1)), ?between(QS1,QE1,QS), ?(QS>=QP), ?(D=1;D=2), ?(QE is QS+D), ?(QE=<QE1) implies slot((QS,QE)).
+
+r141 :: schedule, urgent, slot(QW), ?quantum(Q), ?duration(QW,Q,120) implies query1(QW).
+r142 :: schedule, urgent, ?quantum(Q), present(QP), slot(QW), ?(QW=(QS,QE)), ?duration((QP,QS),Q,TD), ?(TD>2*60) implies -query1(QW).
+r142 >> r141.
+r143 :: schedule, urgent, occupied(_,_,QW1), slot(QW), ?overlap(QW,QW1) implies -query1(QW).
+r143 >> r141.
+
+r111 :: schedule, after(lunch), slot(QW) implies query2(QW).
+r113 :: schedule, after(lunch), following(QP), slot(QW), ?(\+before(QP,QW)) implies -query2(QW).
+r113 >> r111.
+r114 :: schedule, after(lunch), nextlunchtime(QW1), slot(QW), ?overlap(QW,QW1) implies -query2(QW).
+r114 >> r111.
+r115 :: schedule, after(lunch), occupied(_,_,QW1), slot(QW), ?overlap(QW,QW1) implies -query2(QW).
+r115 >> r111.
+
+r193 :: schedule, query1(QW), ?quantum(Q), ?analogize(QW,Q,TW) implies prefered(TW).
+r194 :: schedule, query2(QW), ?quantum(Q), ?analogize(QW,Q,TW) implies prefered(TW).
+r195 :: schedule, prefered(TW1), prefered(TW2), ?tiebreak(TW1,TW2) implies -prefered(TW2).
+r195 >> r194.
+
+r196 :: schedule, prefered(_) implies done.
+r196 >> r021.
+
+r197 :: schedule implies named('<untitled>').
+r198 :: schedule, title(L) implies -named('<untitled>').
+r198 >> r197.
+r199 :: schedule, title(L) implies named(L).
+
+r1do :: schedule, prefered(TW), named(L) implies !create(L,TW).
+r1do :: schedule, done implies !say('Appointment added!').
+r1do :: schedule, -done implies !say('Appointment could not be added!').
+
+% ------------- delete, title(L), before/after(TP/lunch), !remove(ID).
+
+r201 :: delete, occupied(ID,_,_) implies match(ID).
+r202 :: delete, title(L), occupied(ID,L1,_), ?(\+mentions(L1,L)) implies -match(ID).
+r202 >> r201.
+r203 :: delete, preceding(QP), occupied(ID,_,QW), ?(\+before(QW,QP)) implies -match(ID).
+r203 >> r201.
+r204 :: delete, following(QP), occupied(ID,_,QW), ?(\+before(QP,QW)) implies -match(ID).
+r204 >> r201.
+r205 :: delete, match(_) implies done.
+r205 >> r021.
+
+r2do :: delete, match(ID) implies !remove(ID).
+r2do :: delete, done implies !say('All matching appointments deleted!').
+r2do :: delete, -done implies !say('No match found!').
+
+% ------------- quit(M), !leave(R).
+
+r3do :: quit(goodbye) implies !leave('Goodbye!').
+r3do :: quit(exit) implies !leave('Exiting').
+r3do :: quit(logout) implies !leave('Logging out').
+
+% ------------- schedule, demo
+
+r401 :: schedule, demo implies done.
+r401 >> r021.
+
+r4do :: schedule, demo, time((Y,M,D,_,_)) implies !create('OUC public talk',((Y,M,D,10,00),(Y,M,D,11,00))).
+r4do :: schedule, demo, time((Y,M,D,_,_)) implies !create('meeting with Jake',((Y,M,D,14,00),(Y,M,D,17,00))).
+r4do :: schedule, demo, time((Y,M,D,_,_)), ?(D1 is D+1) implies !create('meeting with John',((Y,M,D1,11,00),(Y,M,D1,12,00))).
+r4do :: schedule, demo, time((Y,M,D,_,_)), ?(D1 is D+1) implies !create('call: Jake & Jane',((Y,M,D1,13,00),(Y,M,D1,14,00))).

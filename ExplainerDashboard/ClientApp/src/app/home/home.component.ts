@@ -24,6 +24,8 @@ export class HomeComponent implements AfterViewInit {
   dataSource: CustomStore
   demandDataSource
   decisionDataSource
+  performanceDataSource
+  performanceColumns
   kb
   coach
   days
@@ -46,7 +48,8 @@ export class HomeComponent implements AfterViewInit {
       { "ID": 2, "name": "Pivot" },
       { "ID": 3, "name": "Demand" },
       { "ID": 4, "name": "Decision" },
-      { "ID": 5, "name": "Cost" }
+      { "ID": 5, "name": "Cost" },
+      { "ID": 6, "name": "Performance" }
     ];
 
     this.days = [...Array(50).keys()];
@@ -145,6 +148,21 @@ export class HomeComponent implements AfterViewInit {
     ];
 
 
+    this.performanceColumns = [
+      {
+        dataField: "day", caption: "Day"
+      },
+      {
+        dataField: "weight", caption: "Weight(g)"
+      },
+      {
+        dataField: "feed", caption: "Feed"
+      },
+      {
+        dataField: "fcr", caption: "FCR"
+      },
+    ];
+
     this.decisionColumns = [
       {
         dataField: "day", caption: "Day"
@@ -212,6 +230,26 @@ export class HomeComponent implements AfterViewInit {
       },
     });
 
+    this.performanceDataSource = AspNetData.createStore({
+      key: "id",
+      loadUrl: "/performance/get-performance",
+      insertUrl: "/performance/create-performance",
+      updateUrl: "/performance/update-performance",
+      deleteUrl: "/performance/delete-performance",
+
+
+      onBeforeSend: (method, ajaxOptions) => {
+        if (method === "load") {
+          ajaxOptions.url = ajaxOptions.url + `?day=${this.currentDay}`;
+        }
+      },
+
+      onAjaxError(response) {
+        console.log(response)
+
+      },
+    });
+
     this.costDataSource = AspNetData.createStore({
       key: "id",
       loadUrl: "/cost/get-costs",
@@ -264,7 +302,7 @@ export class HomeComponent implements AfterViewInit {
   onCellPrepared(cellInfo) {
     if (cellInfo.rowType == "data" && cellInfo.column.dataField === 'averageWeight') {
       if (cellInfo.data.averageWeight < cellInfo.data.targetWeight) {
-        cellInfo.cellElement.style.color ='red';
+        cellInfo.cellElement.style.color = 'red';
       }
     }
   }
@@ -285,7 +323,7 @@ export class HomeComponent implements AfterViewInit {
   generateContext(ev) {
     this.solutionService
       .generateContext(this.currentDay)
-      .subscribe((data:any) => {
+      .subscribe((data: any) => {
 
 
         this.solutionService.currentSolution.coach = data.result;
@@ -295,100 +333,121 @@ export class HomeComponent implements AfterViewInit {
 
   pivotInit() {
     this.solutionService.getFlock().subscribe(data => {
-        this.pivotGridDataSource = {
-          fields:
-            [
-              {
-                caption: "Group",
-                dataField: "group",
-                width: 150,
-                area: "row",
-                expanded: true,
-              },
-              {
-                caption: "Grow Day",
-                dataField: "growingDay",
-                width: 150,
-                area: "row",
-                expanded: true,
-              },
-              {
-                dataField: "growingDay",
-                width: 150,
-                area: "filter",
-                filterType: 'include',
-                filterValues: [this.currentDay]
-              },
-       
-              {
-                caption: "Plant",
-                dataField: "plantName",
-                width: 150,
-                area: "row",
-                expanded: true,
-              },
-              {
-                caption: "Plant",
-                dataField: "plantName",
-                width: 150,
-                area: "filter",
-                filterType: 'include',
-                filterValues: this.solutionService.currentSolution.suggestedPlantsList
-              },
-              {
-                caption: "Group",
-                dataField: "group",
-                width: 150,
-                area: "column"
-              },
-              {
-                caption: "CV",
-                dataField: "coefficientVariation",
-                summaryType: "avg",
-                format: { type: 'fixedPoint', precision: 2 },
-                area: "data"
-              },
-              {
-                caption: "FCR",
-                dataField: "fcr",
-                summaryType: "avg",
-                format: { type: 'fixedPoint', precision: 2 },
-                area: "data"
-              },
-              {
-                caption: "Mortality",
-                dataField: "mortalityRate",
-                summaryType: "avg",
-                format: { type: 'fixedPoint', precision: 2 },
-                area: "data"
-              },
-              {
-                caption: "Weight",
-                dataField: "averageWeight",
-                summaryType: "avg",
-                format: { type: 'fixedPoint', precision: 2 },
-                area: "data"
-              },
-              {
-                caption: "Qty",
-                dataField: "liveChickQuantity",
-                dataType: "number",
-                summaryType: "sum",
-                format: "decimal",
-                area: "data"
-              },
+      this.pivotGridDataSource = {
+        fields:
+          [
+            {
+              caption: "Group",
+              dataField: "group",
+              width: 150,
+              area: "row",
+              expanded: true,
+            },
+            {
+              caption: "Grow Day",
+              dataField: "growingDay",
+              width: 150,
+              area: "row",
+              expanded: true,
+            },
+            {
+              dataField: "growingDay",
+              width: 150,
+              area: "filter",
+              filterType: 'include',
+              filterValues: [this.currentDay]
+            },
 
-            ],
-          store: data
+            {
+              caption: "Plant",
+              dataField: "plantName",
+              width: 150,
+              area: "row",
+              expanded: true,
+            },
+            {
+              caption: "Plant",
+              dataField: "plantName",
+              width: 150,
+              area: "filter",
+              filterType: 'include',
+              filterValues: this.solutionService.currentSolution.suggestedPlantsList
+            },
+            {
+              caption: "Group",
+              dataField: "group",
+              width: 150,
+              area: "column"
+            },
+            {
+              caption: "CV",
+              dataField: "coefficientVariation",
+              summaryType: "avg",
+              format: { type: 'fixedPoint', precision: 2 },
+              area: "data"
+            },
+            {
+              caption: "FCR",
+              dataField: "fcr",
+              summaryType: "avg",
+              format: { type: 'fixedPoint', precision: 2 },
+              area: "data"
+            },
+            {
+              caption: "Feed",
+              dataField: "feedConsumption",
+              summaryType: "sum",
+              format: { type: 'fixedPoint', precision: 2 },
+              area: "data"
+            },
+            {
+              caption: "Cost",
+              dataField: "cost",
+              summaryType: "sum",
+              format: { type: 'fixedPoint', precision: 2 },
+              area: "data"
+            },
+            {
+              caption: "Cost Per Bird",
+              dataField: "costPerBird",
+              summaryType: "sum",
+              format: { type: 'fixedPoint', precision: 2 },
+              area: "data"
+            },
+            {
+              caption: "Mortality",
+              dataField: "mortalityRate",
+              summaryType: "avg",
+              format: { type: 'fixedPoint', precision: 2 },
+              area: "data"
+            },
+            {
+              caption: "Weight",
+              dataField: "averageWeight",
+              summaryType: "avg",
+              format: { type: 'fixedPoint', precision: 2 },
+              area: "data"
+            },
+            {
+              caption: "Qty",
+              dataField: "liveChickQuantity",
+              dataType: "number",
+              summaryType: "sum",
+              format: "decimal",
+              area: "data"
+            },
+
+          ],
+        store: data
       }
-      })
+    })
 
   }
 
   customizeTooltip(args) {
 
     var l = args.seriesName.split("-")
-    var plant = l[l.length -1].split("|")[0]
+    var plant = l[l.length - 1].split("|")[0]
 
 
 
@@ -408,7 +467,7 @@ export class HomeComponent implements AfterViewInit {
           // Change series properties here
           return seriesOptions; // This line is optional
         },
-       customizeChart: function (chartOptions) {
+        customizeChart: function (chartOptions) {
           // Change chart properties here
           return chartOptions; // This line is optional
         }
@@ -430,7 +489,7 @@ export class HomeComponent implements AfterViewInit {
     this.solutionService.getBellCurve(mean, std).subscribe((s: any) => {
 
       this.bellCurveData = s.points
-      this.chart_visualRange = [s.min,s.max]
+      this.chart_visualRange = [s.min, s.max]
     })
   }
 

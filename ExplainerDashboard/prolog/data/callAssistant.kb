@@ -1,0 +1,46 @@
+% Silent mobile when I am  at work.
+% Calls from family members are important
+% Decline calls when I am in a meeting at work.
+% Send SMS when i declining important calls from mobile phones.
+% When i am at work and i get important call set  mobile on vibrate mode except i am in a meeting. 
+% I am sleeping from 23:00 until 8:00
+% Decline calls when i am sleeping except they are repeated calls from family member
+
+
+r01 :: my_pos(P1), work_pos(P2), ?dist(P1,P2,D), ?(D<50) implies at_work.
+r02 :: calendar(From,To), time(T), ?(From<T), ?(T<To) implies in_meeting.
+
+% Silent mobile when I am  at work.
+r03 :: at_work implies will_silent.
+
+% When i am at work and i get important call set  mobile on vibrate mode 
+r04 :: at_work implies will_vibrate_mode.
+
+% Calls from family members are important
+r05 :: contact(C,Info), ?member(in_group(family),Info) implies important(C).
+
+
+% Decline calls when I am in a meeting at work.
+r06 :: at_work,in_meeting implies will_decline.
+
+% Send SMS when i declining important calls from mobile phones.
+
+ro7 :: will_decline,important(C) implies !sms(I am in a meeting i wil call you later)
+
+
+
+
+
+
+
+r04 :: call_from(C) implies will_answer(C).
+r05 :: call_from(C), busy implies -will_answer(C).
+r06 :: will_answer(C), implies !answer(C).
+r07 :: -will_answer(C) implies !decline(C).
+
+
+
+% Silent  when  at work.
+% Decline calls when in a meeting.
+% Repeated calls are urgent; unless coming from serial repeated callers.
+% Not Decline urgent calls.

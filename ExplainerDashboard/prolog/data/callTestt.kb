@@ -1,0 +1,2 @@
+r01 :: bird(X) implies flying(X).
+r02 :: penguin(X) implies -flying(X).

@@ -1,0 +1,7 @@
+p(egg6) :: user(X), order(X,caviar) implies order(X,roe).
+p(egg11) :: user(X), order(X,roe) implies order(X,fish_egg).
+p(egg12) :: user(X), order(X,fish_egg) implies order(X,fish).
+p(egg13) :: user(X), order(X,fish_egg) implies order(X,egg).
+p(gen1) :: -want(X,Y), order(X,Y) implies -eatable(X,Y).
+p(veg18) :: user(X), is_a(X,pollotarian) implies -want(X,fish).
+p(veg19) :: user(X), is_a(X,pollotarian) implies -want(X,meat).

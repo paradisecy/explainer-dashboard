@@ -1,0 +1,3 @@
+r01 :: play(X,Y) implies like(X,Y).
+r02 :: hug(X,Y) implies like(X,Y).
+r03 :: argue(X,Y) implies -like(X,Y).

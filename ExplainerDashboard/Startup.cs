@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using System.Linq;
 using MongoDatabaseSettings = ExplainerDashboard.Services.MongoDatabaseSettings;
 
 namespace ExplainerDashboard
@@ -87,7 +88,26 @@ namespace ExplainerDashboard
                 }
             });
 
+            //var m = app.ApplicationServices.GetService<IMongoService>();
+            //var c = m.Database.GetCollection<Performance>("performance");
 
+            //var cc = System.IO.File.ReadAllLines("file.csv");
+
+            //var data = cc.ToList().Skip(1).Select(s =>
+            //{
+            //    var d = s.Split(',');
+            //    var p = new Performance()
+            //    {
+            //        Day = int.Parse(d[0]),
+            //        Weight = decimal.Parse(d[1]),
+            //        Feed = decimal.Parse(d[2]),
+            //        Fcr = decimal.Parse(d[3]),
+            //    };
+            //    return p;
+
+            //}).ToList();
+
+            //c.InsertManyAsync(data);
             //var m = app.ApplicationServices.GetService<IMongoService>();
             //var c = m.Database.GetCollection<Flock>("flocks");
             //c.Find(f => true).ForEachAsync(f =>

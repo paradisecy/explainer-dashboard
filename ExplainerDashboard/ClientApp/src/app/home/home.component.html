@@ -150,15 +150,33 @@
 
 
                 </div>
-
-
-
                 <div *ngIf="company.ID === 5">
                   <dx-data-grid #costGrid
                                 id="costGrid"
                                 [showBorders]="true"
                                 [dataSource]="costDataSource"
                                 [columns]="costColumns"
+                                [allowColumnResizing]="true"
+                                [columnAutoWidth]="true">
+
+                    <dxo-export [enabled]="true" fileName="file"></dxo-export>
+                    <dxo-search-panel [visible]="true"></dxo-search-panel>
+                    <dxo-filter-row [visible]="true"></dxo-filter-row>
+
+                    <dxo-editing mode="batch"
+                                 [allowUpdating]="true"
+                                 [allowAdding]="true"
+                                 [allowDeleting]="true">
+                    </dxo-editing>
+                    <dxo-selection mode="single"></dxo-selection>
+                  </dx-data-grid>
+                </div>
+                <div *ngIf="company.ID === 6">
+                  <dx-data-grid #performanceGrid
+                                id="performanceGrid"
+                                [showBorders]="true"
+                                [dataSource]="performanceDataSource"
+                                [columns]="performanceColumns"
                                 [allowColumnResizing]="true"
                                 [columnAutoWidth]="true">
 

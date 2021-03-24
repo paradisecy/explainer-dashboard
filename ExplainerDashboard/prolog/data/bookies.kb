@@ -1,0 +1,2 @@
+r01 :: match(Team1,Team2) implies bet(Team1).
+r02 :: match(Team1,Team2) implies bet(Team2).

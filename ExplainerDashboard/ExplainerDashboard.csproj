@@ -19,6 +19,8 @@
     <PackageReference Include="MongoDB.Bson" Version="2.11.6" />
     <PackageReference Include="MongoDB.Driver" Version="2.11.6" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="TensorFlow.Keras" Version="0.5.0" />
+    <PackageReference Include="TensorFlow.NET" Version="0.40.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,6 +44,9 @@
 
   <ItemGroup>
     <None Update="context.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="execProlog.bat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="exec.bat">

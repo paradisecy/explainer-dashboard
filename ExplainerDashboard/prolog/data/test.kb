@@ -1,0 +1,5 @@
+r01 :: b implies a.
+story0 :: true implies meander(circle).
+story1 :: true implies inside(circle).
+question10 :: tired(circle) implies meander(circle).
+question20 :: fearThat(circle,something) implies meander(circle).

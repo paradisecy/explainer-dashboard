@@ -1,0 +1,5 @@
+r01 :: predicate1(play(X,L),Y), -predicate2(Z) implies predicate3(Y).
+r100 :: predicate1(X1,Y1), -predicate2(Z1) implies predicate3(Z1).
+r02 :: a implies -c.
+r03 :: -c implies p.
+r04 :: -q implies p.

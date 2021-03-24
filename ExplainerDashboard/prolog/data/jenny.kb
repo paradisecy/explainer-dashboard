@@ -1,0 +1,74 @@
+% Author: Loizos Michael
+% Date: 2017-08-12
+
+% ============= Jenny, Call Assistant
+
+
+
+% ============= NL Policy
+
+% Decline calls when busy; e.g., when in a meeting at work.
+% Calls from family members are important.
+% Send SMS when declining important calls.
+% Repeated calls are urgent; unless coming from “serial” repeated callers.
+% Repeated important calls are urgent.
+% Answer urgent calls.
+% Answer calls from colleagues that are expected.
+
+
+% ============= Knowledge
+
+r01 :: my_pos(P1), work_pos(P2), ?dist(P1,P2,D), ?(D<50) implies at_work.
+r02 :: calendar(From,To), time(T), ?(From<T), ?(T<To) implies in_meeting.
+r03 :: in_meeting, at_work implies busy.
+
+r04 :: call_from(C) implies will_answer(C).
+r05 :: call_from(C), busy implies -will_answer(C).
+r06 :: will_answer(C) implies !answer(C).
+r07 :: -will_answer(C) implies !decline(C).
+
+r08 :: contact(C,Info), ?member(in_group(family),Info) implies important(C).
+r09 :: call_from(C), important(C), -will_answer(C) implies !sms(C,'Busy...').
+
+r10 :: contact(C,Info), ?member(log(L),Info), ?last_entry(E,L), ?member(when(W),E), time(T), ?diff(W,T,D), ?(D<3) implies recent_caller(C).
+r11 :: call_from(C), recent_caller(C) implies urgent(C).
+r12 :: contact(C,Info), ?member(log(L),Info), ?repeated_calls(L,3,Count), ?(Count>3) implies serial_repeated_caller(C).
+r13 :: call_from(C), serial_repeated_caller(C) implies -urgent(C).
+
+r14 :: call_from(C), recent_caller(C), important(C) implies urgent(C).
+r15 :: call_from(C), urgent(C) implies will_answer(C).
+
+r16 :: contact(C,Info), ?member(in_group(work),Info) implies colleague(C).
+r17 :: call_from(C), colleague(C), is_expected(C) implies will_answer(C).
+
+
+% ============= Queries
+
+dist((X1,Y1),(X2,Y2),D) :-
+   D is sqrt((X1-X2)^2 + (Y1-Y2)^2).
+   
+last_entry(E,[E|_]).
+
+% assumes times are within the same day, and H1:M1 <= H2:M2.
+diff(H1:M1,H2:M2,D) :-
+   D is (H2-H1)*60 + M2-M1.
+
+% assumes log is ordered.
+repeated_calls([],_Span,0).
+repeated_calls([_],_Span,0).
+repeated_calls([E1,E2|L],Span,Count1) :-
+   member(when(W1),E1),
+   member(when(W2),E2),
+   diff(W1,W2,D),
+   if(D<=Span, Add=1, Add=0),
+   repeated_calls([E2|L],Span,Count2),
+   Count1 is Count2 + Add.
+
+% ============= Actions
+
+answer(C) :-
+   say(['Call from ',C,' answered!']).
+decline(C) :-
+   say(['Call from ',C,' declined!']).
+sms(C,Text) :-
+   writeln('SMS sent to ',C',': ',Text]).
